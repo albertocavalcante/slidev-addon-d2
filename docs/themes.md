@@ -36,13 +36,11 @@ D2 includes a variety of built-in themes. Use the `theme` option to set one.
 
 By default, diagrams use theme `0` in light mode and theme `200` in dark mode. This switches automatically when the user toggles Slidev's dark mode.
 
-To customize:
+To customize, use `` ```d2 {theme: 5, darkTheme: 302} ``:
 
-````markdown
-```d2 {theme: 5, darkTheme: 302}
+```d2
 a -> b
 ```
-````
 
 - `theme` — used in light mode (and both modes if `darkTheme` is not set)
 - `darkTheme` — used only in dark mode
