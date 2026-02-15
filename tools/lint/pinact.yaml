@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/suzuki-shunsuke/pinact/main/json-schema/pinact.json
+#
+# pinact - Pin GitHub Actions versions to full commit SHAs
+# https://github.com/suzuki-shunsuke/pinact
+
+version: 3
+
+files:
+  - pattern: ".github/workflows/*.yml"
+  - pattern: ".github/workflows/*.yaml"

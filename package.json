@@ -1,5 +1,5 @@
 {
-  "name": "slidev-addon-d2",
+  "name": "@albertocavalcante/slidev-addon-d2",
   "version": "0.1.0",
   "description": "D2 diagram support for Slidev presentations",
   "keywords": ["slidev-addon", "slidev", "d2", "diagrams", "architecture"],
@@ -25,6 +25,9 @@
   },
   "peerDependencies": {
     "@slidev/cli": ">=52.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "devDependencies": {
     "@slidev/cli": "latest",

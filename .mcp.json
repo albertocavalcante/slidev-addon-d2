@@ -1,0 +1,9 @@
+{
+  "playwright": {
+    "command": "npx",
+    "args": ["@playwright/mcp@0.0.64"],
+    "//version": "0.0.64",
+    "//commit": "e39e83bb130069a36b14a1e9274315e724f82ab3",
+    "//repo": "https://github.com/microsoft/playwright-mcp"
+  }
+}

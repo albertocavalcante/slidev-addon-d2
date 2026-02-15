@@ -1,0 +1,45 @@
+pre-commit:
+  parallel: true
+  commands:
+    workflow-lint:
+      glob: ".github/workflows/*.{yml,yaml}"
+      run: |
+        if command -v ghalint &> /dev/null; then
+          ghalint run -c tools/lint/ghalint.yaml
+        fi
+        if command -v actionlint &> /dev/null; then
+          actionlint {staged_files}
+        else
+          echo "Warning: actionlint not installed. Install with: brew install actionlint shellcheck"
+        fi
+      fail_text: "Workflow lint failed. Install: brew install actionlint shellcheck"
+
+    workflow-pin:
+      glob: ".github/workflows/*.{yml,yaml}"
+      run: |
+        if command -v pinact &> /dev/null; then
+          pinact run --verify -c tools/lint/pinact.yaml
+        fi
+      fail_text: "Run 'pinact run -u -c tools/lint/pinact.yaml' to pin action versions"
+
+commit-msg:
+  commands:
+    semantic-commit:
+      run: |
+        commit_msg=$(cat {1})
+        pattern="^(feat|fix|docs|chore|refactor|test|ci|perf|style|build)(\(.+\))?: .+"
+        if ! echo "$commit_msg" | grep -qE "$pattern"; then
+          echo "ERROR: Commit message does not follow semantic commit format"
+          echo ""
+          echo "Expected format: <type>(<scope>): <description>"
+          echo ""
+          echo "Types: feat, fix, docs, chore, refactor, test, ci, perf, style, build"
+          echo ""
+          echo "Examples:"
+          echo "  feat: add user authentication"
+          echo "  fix(parser): handle empty input"
+          echo "  ci: update workflow actions"
+          echo ""
+          echo "Your message: $commit_msg"
+          exit 1
+        fi
