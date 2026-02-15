@@ -1,9 +1,22 @@
 import { defineConfig } from 'vitepress'
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+const d2Grammar = JSON.parse(
+  readFileSync(join(__dirname, 'grammars/d2.tmLanguage.json'), 'utf8'),
+)
 
 export default defineConfig({
   title: 'slidev-addon-d2',
   description: 'D2 diagram support for Slidev presentations',
   base: '/slidev-addon-d2/',
+
+  markdown: {
+    languages: [d2Grammar],
+  },
 
   head: [
     ['meta', { name: 'og:type', content: 'website' }],
