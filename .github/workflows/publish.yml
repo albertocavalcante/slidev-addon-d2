@@ -45,10 +45,11 @@ jobs:
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
           " "${VERSION}"
 
+      - name: Configure registry auth
+        run: echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
+
       - name: Publish to GitHub Packages
-        run: bun publish --access public --registry https://npm.pkg.github.com
-        env:
-          BUN_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun publish --access public
 
   publish-npm:
     name: Publish to npm
@@ -82,7 +83,15 @@ jobs:
             fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
           " "${VERSION}"
 
+      - name: Configure for npm registry
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > .npmrc
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            delete pkg.publishConfig;
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+
       - name: Publish to npm
-        run: bun publish --access public --registry https://registry.npmjs.org
-        env:
-          BUN_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bun publish --access public
