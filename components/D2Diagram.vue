@@ -6,12 +6,25 @@ let d2Promise: Promise<any> | null = null
 
 function getD2() {
   if (!d2Promise) {
-    d2Promise = import('@terrastruct/d2').then(({ D2 }) => new D2())
+    d2Promise = import('@terrastruct/d2').then(({ D2 }) => new D2()).catch((e) => {
+      d2Promise = null // allow retry on failure
+      throw e
+    })
   }
   return d2Promise
 }
 
 const cache = new Map<string, string>()
+
+// D2 WASM crashes when compile/render run concurrently.
+// Serialize all operations through a queue.
+let queue: Promise<void> = Promise.resolve()
+
+function enqueue<T>(fn: () => Promise<T>): Promise<T> {
+  const p = queue.then(fn, fn)
+  queue = p.then(() => {}, () => {})
+  return p
+}
 </script>
 
 <script setup lang="ts">
@@ -63,18 +76,20 @@ watchEffect(async (onCleanup) => {
   loading.value = true
 
   try {
-    const d2 = await getD2()
+    const svg = await enqueue(async () => {
+      const d2 = await getD2()
 
-    const result = await d2.compile(code, {
-      sketch: props.sketch ?? false,
-      themeID,
-      layout: props.layout,
-      pad: props.pad,
-    })
+      const result = await d2.compile(code, {
+        sketch: props.sketch ?? false,
+        themeID,
+        layout: props.layout,
+        pad: props.pad,
+      })
 
-    const svg = await d2.render(result.diagram, {
-      ...result.renderOptions,
-      noXMLTag: true,
+      return await d2.render(result.diagram, {
+        ...result.renderOptions,
+        noXMLTag: true,
+      })
     })
 
     if (!disposed) {
