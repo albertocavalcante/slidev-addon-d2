@@ -7,15 +7,35 @@
 
 ## Install
 
+The package is currently published to [GitHub Packages](https://github.com/albertocavalcante/slidev-addon-d2/packages). An npm release is coming soon.
+
+### From GitHub Packages
+
+First, create a `.npmrc` file in your project root to configure the `@albertocavalcante` scope:
+
+```ini
+@albertocavalcante:registry=https://npm.pkg.github.com
+```
+
+Then install:
+
 ```bash
-bun add slidev-addon-d2
+bun add @albertocavalcante/slidev-addon-d2
 ```
 
 Or with other package managers:
 
 ```bash
-npm install slidev-addon-d2
-pnpm add slidev-addon-d2
+npm install @albertocavalcante/slidev-addon-d2
+pnpm add @albertocavalcante/slidev-addon-d2
+```
+
+### From npm (coming soon)
+
+Once published to npm, you'll be able to install directly without any `.npmrc` configuration:
+
+```bash
+bun add slidev-addon-d2
 ```
 
 ## Enable the addon

@@ -8,10 +8,18 @@ Uses the official [`@terrastruct/d2`](https://www.npmjs.com/package/@terrastruct
 
 ## Quick Start
 
+The package is currently published to [GitHub Packages](https://github.com/albertocavalcante/slidev-addon-d2/packages). An npm release is coming soon.
+
+Add a `.npmrc` to your project to configure the `@albertocavalcante` scope:
+
+```ini
+@albertocavalcante:registry=https://npm.pkg.github.com
+```
+
 Install the package:
 
 ```bash
-bun add slidev-addon-d2
+bun add @albertocavalcante/slidev-addon-d2
 ```
 
 Enable the addon in your slides frontmatter:
