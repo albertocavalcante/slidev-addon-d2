@@ -1,0 +1,33 @@
+{
+  "name": "slidev-addon-d2",
+  "version": "0.1.0",
+  "description": "D2 diagram support for Slidev presentations",
+  "keywords": ["slidev-addon", "slidev", "d2", "diagrams", "architecture"],
+  "license": "MIT",
+  "author": "Alberto Cavalcante",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/albertocavalcante/slidev-addon-d2"
+  },
+  "type": "module",
+  "files": [
+    "components",
+    "setup",
+    "LICENSE"
+  ],
+  "slidev": {
+    "components": true,
+    "setup": true
+  },
+  "dependencies": {
+    "@terrastruct/d2": "^0.1.33",
+    "lz-string": "^1.5.0"
+  },
+  "peerDependencies": {
+    "@slidev/cli": ">=52.0.0"
+  },
+  "devDependencies": {
+    "@slidev/cli": "latest",
+    "@types/bun": "latest"
+  }
+}

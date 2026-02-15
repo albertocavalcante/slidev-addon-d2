@@ -1,0 +1,14 @@
+{
+  "name": "slidev-addon-d2-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "slidev",
+    "build": "slidev build"
+  },
+  "dependencies": {
+    "@slidev/cli": "latest",
+    "@slidev/theme-default": "^0.25.0",
+    "slidev-addon-d2": "link:.."
+  }
+}
