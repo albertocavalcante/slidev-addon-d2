@@ -23,6 +23,24 @@ A Slidev addon that adds native D2 diagram support via ` ```d2 ` fenced code blo
 - **D2 WASM API:** `compile(code, options)` → `render(diagram, renderOptions)`. Always use `noXMLTag: true` for HTML embedding. Errors are JSON-encoded arrays.
 - **Local dev testing:** Use the `example/` directory with `bun install && bun run dev`. The example links to the addon via `bun link`.
 
+## Known Gotchas
+
+### WASM concurrency — compile/render calls must be serialized
+
+D2 WASM crashes (tab crash, `[object Object]` output, infinite loading spinners) when multiple `compile()`/`render()` calls run concurrently. Slidev pre-renders adjacent slides, so all `D2Diagram` component instances fire their `watchEffect` simultaneously. Without serialization, the concurrent WASM calls corrupt shared state.
+
+**Fix:** All compile/render operations go through a module-level `enqueue()` function that chains promises sequentially. The `getD2()` singleton also clears `d2Promise` on failure so a broken WASM import can be retried. Never remove the serialization queue.
+
+### SVG overflow — diagrams must be viewBox-scaled to fit slides
+
+D2 renders SVGs with explicit `width`/`height` attributes that often exceed the slide viewport (960×540 default). Without viewBox-based sizing, diagrams overflow the slide boundary and get clipped.
+
+**Fix:** After rendering, the component extracts `viewBox` height from the SVG, sets an explicit `height` attribute (scaled by the `scale` prop, default 1), and removes the `width`/`style` attributes so the SVG scales responsively within CSS `max-height: 100%` constraints. This is the same pattern Slidev's built-in Mermaid integration uses (`@slidev/client/builtin/Mermaid.vue`). Users can fine-tune with `{scale: 0.8}` in the code block options. Never set both explicit `width` and `height` on the SVG — remove `width` and let the browser calculate it from the aspect ratio.
+
+### Local dev server — Slidev needs a TTY
+
+`bunx slidev` (dev mode) exits immediately when run as a background process without a TTY. The server prints its banner then quits because its readline handler detects no terminal. Use `script -q /dev/null bash -c "bun run dev -- --port 3030"` to provide a pseudo-TTY when running headless. This only affects the dev server; `bunx slidev build` works fine without a TTY.
+
 ## Read PLAN.md for full context
 
 The PLAN.md file contains the original implementation plan, reference implementations, D2 language reference, and all useful links.

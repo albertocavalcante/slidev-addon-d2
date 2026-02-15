@@ -28,7 +28,7 @@ function enqueue<T>(fn: () => Promise<T>): Promise<T> {
 </script>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 import { useDark } from '@vueuse/core'
 
 const props = defineProps<{
@@ -45,6 +45,37 @@ const isDark = useDark()
 const html = ref('')
 const error = ref<string | null>(null)
 const loading = ref(true)
+const svgContainer = ref<HTMLElement>()
+const actualHeight = ref<number>()
+
+// Reset viewBox height when SVG content changes
+watch(html, () => {
+  actualHeight.value = undefined
+})
+
+// Extract viewBox height from rendered SVG (same pattern as Mermaid)
+watchEffect(() => {
+  const svgEl = svgContainer.value?.children?.[0] as SVGElement | undefined
+  if (svgEl && svgEl.hasAttribute('viewBox') && actualHeight.value == null) {
+    const v = Number.parseFloat(svgEl.getAttribute('viewBox')?.split(' ')[3] || '')
+    actualHeight.value = Number.isNaN(v) ? undefined : v
+  }
+}, { flush: 'post' })
+
+// Apply viewBox-based sizing: remove explicit dimensions so CSS can constrain,
+// or set explicit height when scale prop is provided for manual control.
+watchEffect(() => {
+  const svgEl = svgContainer.value?.children?.[0] as SVGElement | undefined
+  if (svgEl != null && actualHeight.value != null) {
+    svgEl.removeAttribute('width')
+    svgEl.removeAttribute('style')
+    if (props.scale != null) {
+      svgEl.setAttribute('height', `${actualHeight.value * props.scale}`)
+    } else {
+      svgEl.removeAttribute('height')
+    }
+  }
+}, { flush: 'post' })
 
 watchEffect(async (onCleanup) => {
   let disposed = false
@@ -124,9 +155,9 @@ watchEffect(async (onCleanup) => {
     <pre v-else-if="error" class="slidev-d2-error">{{ error }}</pre>
     <div
       v-else
+      ref="svgContainer"
       class="slidev-d2-svg"
       v-html="html"
-      :style="scale ? { transform: `scale(${scale})`, transformOrigin: 'top center' } : undefined"
     />
   </div>
 </template>
@@ -145,9 +176,12 @@ watchEffect(async (onCleanup) => {
   width: 100%;
 }
 
+/* Slidev slides are 960×540 (16:9) with 80px vertical padding in the default layout.
+   Cap diagram height to leave room for headings and surrounding content. */
 .slidev-d2-svg svg {
   max-width: 100%;
   height: auto;
+  max-height: 400px;
 }
 
 .slidev-d2-loading {
